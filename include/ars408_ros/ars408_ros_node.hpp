@@ -22,6 +22,8 @@
 #include "radar_msgs/msg/radar_scan.hpp"
 #include "radar_msgs/msg/radar_tracks.hpp"
 #include "unique_identifier_msgs/msg/uuid.hpp"
+#include <visualization_msgs/msg/marker_array.hpp>
+#include <tf2/LinearMath/Quaternion.h>
 
 #include <random>
 #include <string>
@@ -34,6 +36,7 @@ class PeContinentalArs408Node : public rclcpp::Node
   rclcpp::Subscription<can_msgs::msg::Frame>::SharedPtr subscription_;
   rclcpp::Publisher<radar_msgs::msg::RadarTracks>::SharedPtr publisher_radar_tracks_;
   rclcpp::Publisher<radar_msgs::msg::RadarScan>::SharedPtr publisher_radar_scan_;
+  rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr marker_array_publisher_;
 
   can_msgs::msg::Frame::ConstSharedPtr can_data_;
 

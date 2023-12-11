@@ -13,6 +13,7 @@ endif()
 
 find_package(ament_cmake_auto REQUIRED)
 ament_auto_find_build_dependencies()
+#find_package(visualization_msgs REQUIRED)
 
 # Driver Library
 ament_auto_add_library(pe_ars408_parser SHARED

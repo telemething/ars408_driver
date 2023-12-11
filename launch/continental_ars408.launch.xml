@@ -4,12 +4,14 @@
   <arg name="output/objects" default="objects_raw" />
   <arg name="output/scan" default="scan" />
   <!-- parameter -->
-  <arg name="output_frame" default="ars408" />
+  <arg name="output_frame" default="front_radar" />
   <arg name="publish_radar_track" default="true" />
-  <arg name="publish_radar_scan" default="false" />
+  <arg name="publish_radar_scan" default="true" />
   <arg name="sequential_publish" default="false" />
   <arg name="size_x" default="1.8" />
   <arg name="size_y" default="1.8" />
+
+  <node pkg="tf2_ros" exec="static_transform_publisher" name="map_to_front_radar_link_broadcaster" args="0 0 0 0 0 0 map front_radar" output="screen"/>
 
   <node pkg="pe_ars408_ros" exec="pe_ars408_node" name="pe_ars408_node" output="screen">
     <remap from="~/input/frame" to="$(var input/frame)" />

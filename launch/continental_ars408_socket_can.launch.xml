@@ -12,7 +12,7 @@
   <arg name="output/scan" default="scan" />
   <arg name="publish_radar_track" default="true" />
   <arg name="publish_radar_scan" default="false" />
-  <arg name="output_frame" default="ars408" />
+  <arg name="output_frame" default="front_radar" />
   <arg name="sequential_publish" default="false" />
   <arg name="size_x" default="1.8" />
   <arg name="size_y" default="1.8" />

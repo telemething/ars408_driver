@@ -110,21 +110,159 @@ void PeContinentalArs408Node::RadarDetectedObjectsCallback(
   output_scan.header.frame_id = output_frame_;
   output_scan.header.stamp = can_data_->header.stamp;
 
-  for (const auto & object : detected_objects) {
-    if (publish_radar_track_) {
+  //***************************************************************************************
+
+  visualization_msgs::msg::MarkerArray marker_array;
+  marker_array.markers.clear();
+
+  //delete old marker
+  visualization_msgs::msg::Marker ma;
+  ma.action=3;
+  marker_array.markers.push_back(ma);
+  marker_array_publisher_->publish(marker_array);
+  marker_array.markers.clear();
+
+  //marker for ego car
+  visualization_msgs::msg::Marker mEgoCar;
+
+  mEgoCar.header.stamp = can_data_->header.stamp;
+  mEgoCar.header.frame_id = output_frame_;
+  mEgoCar.ns = "";
+  mEgoCar.id = 999;
+
+  //if you want to use a cube comment out the next 2 lines
+  //mEgoCar.type = visualization_msgs::msg::Marker::MESH_RESOURCE;
+  //mEgoCar.mesh_resource = "file://"+ament_index_cpp::get_package_share_directory("radar_conti_ars408")+"/resources/low_poly_911.dae";
+  // mEgoCar.type = 1; // cube
+  mEgoCar.action = 0; // add/modify
+  mEgoCar.pose.position.x = 0.0;
+  mEgoCar.pose.position.y = 0.0;
+  mEgoCar.pose.position.z = 0.0;
+
+  tf2::Quaternion myQuaternion;
+  myQuaternion.setRPY(0, 0, M_PI/2);
+  //myQuaternion.setRPY(0, 0, 0);
+
+  mEgoCar.pose.orientation.w = myQuaternion.getW();
+  mEgoCar.pose.orientation.x = myQuaternion.getX();
+  mEgoCar.pose.orientation.y = myQuaternion.getY();
+  mEgoCar.pose.orientation.z = myQuaternion.getZ();
+  mEgoCar.scale.x = 1.0;
+  mEgoCar.scale.y = 1.0;
+  mEgoCar.scale.z = 1.0;
+  mEgoCar.color.r = 0.0;
+  mEgoCar.color.g = 0.0;
+  mEgoCar.color.b = 1.0;
+  mEgoCar.color.a = 1.0;
+  mEgoCar.lifetime = rclcpp::Duration(0.2,0);
+  mEgoCar.frame_locked = false;
+
+  marker_array.markers.push_back(mEgoCar);
+
+  int32_t marker_index = 100;
+
+  //****************************************************************************************
+
+  for (const auto & object : detected_objects) 
+  {
+    if (publish_radar_track_) 
+    {
       output_objects.tracks.emplace_back(ConvertRadarObjectToRadarTrack(object.second));
     };
-    if (publish_radar_scan_) {
+    if (publish_radar_scan_) 
+    {
       output_scan.returns.emplace_back(ConvertRadarObjectToRadarReturn(object.second));
     }
+
+    //****************************************************************************************
+
+    if(true)
+    {
+      visualization_msgs::msg::Marker mobject;
+      /*visualization_msgs::msg::Marker mtext;
+
+      mtext.header.stamp = can_data_->header.stamp;
+      mtext.header.frame_id = output_frame_;
+      mtext.ns = "";
+      mtext.id = (object.first+100);
+      mtext.type = 1; //Cube
+      mtext.action = 0; // add/modify
+      mtext.pose.position.x = object.second.distance_long_x;
+      mtext.pose.position.y = object.second.distance_lat_y;
+      mtext.pose.position.z = 4.0;
+
+                  
+      //myQuaternion.setRPY(M_PI / 2, 0, 0);
+      myQuaternion.setRPY(0, 0, 0);
+
+      mtext.pose.orientation.w = myQuaternion.getW();
+      mtext.pose.orientation.x = myQuaternion.getX();
+      mtext.pose.orientation.y = myQuaternion.getY();
+      mtext.pose.orientation.z = myQuaternion.getZ();
+      mtext.scale.x = 1.0;
+      mtext.scale.y = 1.0;
+      mtext.scale.z = 2.0;
+      mtext.color.r = 1.0;
+      mtext.color.g = 1.0;
+      mtext.color.b = 1.0;
+      mtext.color.a = 1.0;
+      mtext.lifetime = rclcpp::Duration(0.2,0);
+      mtext.frame_locked = false;
+      mtext.type=9;
+      mtext.text= "object_" + std::to_string(object.first) + ": \n" 
+        + " RCS: " + std::to_string(object.second.rcs) + "dBm^2" + " \n" 
+        + " V_long: " +   std::to_string(object.second.speed_long_x) + "m/s" + " \n" 
+        + " V_lat: " + std::to_string(object.second.speed_lat_y) + "m/s" + " \n" 
+        + " Orientation: " + std::to_string(object.second.orientation_angle) + "degree";
+
+      marker_array.markers.push_back(mtext);*/
+
+      mobject.header.stamp = can_data_->header.stamp;
+      mobject.header.frame_id = output_frame_;
+      mobject.ns = "";
+      mobject.id = object.first;
+      mobject.type = 1; //Cube
+      mobject.action = 0; // add/modify
+      mobject.pose.position.x = object.second.distance_long_x;
+      mobject.pose.position.y = object.second.distance_lat_y;
+      mobject.pose.position.z = 1.0;
+
+      myQuaternion.setRPY(0, 0, 0);
+
+      mobject.pose.orientation.w = myQuaternion.getW();
+      mobject.pose.orientation.x = myQuaternion.getX();
+      mobject.pose.orientation.y = myQuaternion.getY();
+      mobject.pose.orientation.z = myQuaternion.getZ();
+      mobject.scale.x = object.second.length;
+      mobject.scale.y = object.second.width;
+      mobject.scale.z = 1.0;
+      mobject.color.r = 0.0;
+      mobject.color.g = 1.0;
+      mobject.color.b = 0.0;
+      mobject.color.a = 1.0;
+      mobject.lifetime = rclcpp::Duration(0.2,0);
+      mobject.frame_locked = false;
+
+      marker_array.markers.push_back(mobject);
+    }
+
+  //****************************************************************************************
   }
 
-  if (publish_radar_track_) {
+  if (publish_radar_track_) 
+  {
     publisher_radar_tracks_->publish(output_objects);
   }
-  if (publish_radar_scan_) {
+  if (publish_radar_scan_) 
+  {
     publisher_radar_scan_->publish(output_scan);
+  }  
+  if (true) 
+  {
+    marker_array_publisher_->publish(marker_array);
   }
+
+
 }
 
 unique_identifier_msgs::msg::UUID PeContinentalArs408Node::GenerateRandomUUID()
@@ -156,13 +294,18 @@ void PeContinentalArs408Node::Run()
     std::bind(&PeContinentalArs408Node::RadarDetectedObjectsCallback, this, std::placeholders::_1),
     sequential_publish_);
 
+  //subscription_ = this->create_subscription<can_msgs::msg::Frame>(
+  //  "~/input/frame", 10,
+  //  std::bind(&PeContinentalArs408Node::CanFrameCallback, this, std::placeholders::_1));
+
   subscription_ = this->create_subscription<can_msgs::msg::Frame>(
-    "~/input/frame", 10,
+    "/from_can_bus", 10,
     std::bind(&PeContinentalArs408Node::CanFrameCallback, this, std::placeholders::_1));
 
   publisher_radar_tracks_ =
     this->create_publisher<radar_msgs::msg::RadarTracks>("~/output/objects", 10);
   publisher_radar_scan_ = this->create_publisher<radar_msgs::msg::RadarScan>("~/output/scan", 10);
+  marker_array_publisher_ = this->create_publisher<visualization_msgs::msg::MarkerArray>("~/output/markers", 10);
 }
 
 #include "rclcpp_components/register_node_macro.hpp"
