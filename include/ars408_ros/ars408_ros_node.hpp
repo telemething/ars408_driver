@@ -34,11 +34,14 @@ class PeContinentalArs408Node : public rclcpp::Node
 {
   rclcpp::Subscription<can_msgs::msg::Frame>::SharedPtr subscriber_can_raw_;
   rclcpp::Subscription<can_msgs::msg::Frame>::SharedPtr subscription_;
+  rclcpp::Publisher<can_msgs::msg::Frame>::SharedPtr can_messages_out_;
   rclcpp::Publisher<radar_msgs::msg::RadarTracks>::SharedPtr publisher_radar_tracks_;
   rclcpp::Publisher<radar_msgs::msg::RadarScan>::SharedPtr publisher_radar_scan_;
   rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr marker_array_publisher_;
 
   can_msgs::msg::Frame::ConstSharedPtr can_data_;
+
+  ars408::RadarState ars408_state_;
 
   std::string output_frame_;
   bool publish_radar_track_;
@@ -46,6 +49,9 @@ class PeContinentalArs408Node : public rclcpp::Node
   bool sequential_publish_;
   double size_x_;
   double size_y_;
+
+  // set to true to configure the radar if needed after receipt of the first status message
+  bool run_config_ = true;
 
   const uint8_t max_radar_id = 255;
   std::vector<unique_identifier_msgs::msg::UUID> UUID_table_;
@@ -65,7 +71,10 @@ class PeContinentalArs408Node : public rclcpp::Node
   static unique_identifier_msgs::msg::UUID GenerateRandomUUID();
 
 public:
+
   explicit PeContinentalArs408Node(const rclcpp::NodeOptions & node_options);
+  void SendCanMessage(const can_msgs::msg::Frame::SharedPtr can_msg);
+  void RunConfig(const can_msgs::msg::Frame::SharedPtr can_msg);
   void RadarDetectedObjectsCallback(
     const std::unordered_map<uint8_t, ars408::RadarObject> & detected_objects);
   void Run();

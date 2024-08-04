@@ -237,11 +237,12 @@ std::array<uint8_t, 8> Ars408Driver::GenerateRadarConfiguration(
     // ARS408:
     // Standard Range Version: 196 – 260 m
     // Extended Range Version: 196 – 1200 m
-    // uint16_t TempDistance = in_new_status.MaxDistance * 2;
-    // uint8_t low_byte = (TempDistance & 0x0002u) << 6u;
-    // uint8_t high_byte = (TempDistance & 0x0FFFu) >> 2u;
-    can_data[1] = 0x00; /* XXXX XXXX */
-    can_data[2] = 0x00; /* XX00 0000 */
+
+    uint16_t TempDistance = in_new_status.MaxDistance;
+    uint8_t low_byte = (TempDistance & 0x0002u) << 6u;
+    uint8_t high_byte = (TempDistance & 0x0FFFu) >> 4u;
+    can_data[1] = high_byte; /* XXXX XXXX */
+    can_data[2] = low_byte; /* XX00 0000 */
   }
 
   return can_data;

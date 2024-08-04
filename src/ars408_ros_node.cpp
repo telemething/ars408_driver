@@ -26,11 +26,71 @@ PeContinentalArs408Node::PeContinentalArs408Node(const rclcpp::NodeOptions & nod
   Run();
 }
 
+//for now we only allow this fixed config. In the future maybe we can make this configurable.
+void PeContinentalArs408Node::RunConfig(const can_msgs::msg::Frame::SharedPtr can_msg)
+{
+  // try to fetch the current radar state
+  if(ars408_driver_.GetCurrentRadarState(ars408_state_))
+  {
+    // if the radar is not set to output objects, set it to output objects
+    if( ars408_state_.OutputType !=  ars408::RadarState::OBJECTS )
+    {
+      RCLCPP_INFO(this->get_logger(), "Setting radar to output objects");
+
+      ars408::RadarCfg radar_new_config;
+      radar_new_config.OutputType = ars408::RadarCfg::OBJECTS;
+      //radar_new_config.OutputType = ars408::RadarCfg::NONE;
+      radar_new_config.UpdateOutputType = true;
+
+      radar_new_config.StoreInNVM = true;
+      radar_new_config.UpdateStoreInNVM = true;
+
+      radar_new_config.SendQuality = true;
+      radar_new_config.UpdateSendQuality = true;
+
+      radar_new_config.SendExtInfo = true;
+      radar_new_config.UpdateSendExtInfo = true;
+
+      radar_new_config.RadarPower = ars408::RadarCfg::RadarPowerConfig::MINUS_9dB_GAIN;
+      radar_new_config.UpdateRadarPower = true;
+
+      radar_new_config.RCS_Status = ars408::RadarCfg::RCS_Threshold::HIGH_SENSITIVITY;
+      radar_new_config.UpdateRCS_Threshold = true;
+
+      radar_new_config.SortIndex = ars408::RadarCfg::Sorting::BY_RANGE;
+      radar_new_config.UpdateSortIndex = true;
+
+      radar_new_config.MaxDistance = 256;
+      radar_new_config.UpdateMaxDistance = true;
+
+      auto can_command = ars408_driver_.GenerateRadarConfiguration(radar_new_config);
+
+      can_msgs::msg::Frame config_can_frame;
+      config_can_frame.header = can_msg->header;
+      config_can_frame.data = can_command;
+      config_can_frame.id = ars408::RADAR_CFG;
+      config_can_frame.dlc = ars408::RADAR_CFG_BYTES;
+
+      //cansend can0 200#F8000000089C0000 // Objects detection with all extended properties
+      //cansend can0 200#F8000000109C0000 // Clusters detection with all extended properties
+
+      SendCanMessage(std::make_shared<can_msgs::msg::Frame>(config_can_frame));
+    }
+
+    // don't configure again
+    run_config_ = false;
+  }  
+}
+
 void PeContinentalArs408Node::CanFrameCallback(const can_msgs::msg::Frame::SharedPtr can_msg)
 {
   if (!can_msg->data.empty()) {
     can_data_ = can_msg;
     ars408_driver_.Parse(can_msg->id, can_msg->data, can_msg->dlc);
+
+    // if we need to configure the radar, do it now
+    if(run_config_)
+      RunConfig(can_msg);
   }
 }
 
@@ -97,6 +157,12 @@ radar_msgs::msg::RadarReturn PeContinentalArs408Node::ConvertRadarObjectToRadarR
   radar_return.elevation = 0.0;
   radar_return.amplitude = 0.0;
   return radar_return;
+}
+
+// send a message to the radar over the CAN bus
+void PeContinentalArs408Node::SendCanMessage(const can_msgs::msg::Frame::SharedPtr can_msg)
+{
+  can_messages_out_->publish(*can_msg);
 }
 
 void PeContinentalArs408Node::RadarDetectedObjectsCallback(
@@ -298,9 +364,13 @@ void PeContinentalArs408Node::Run()
   //  "~/input/frame", 10,
   //  std::bind(&PeContinentalArs408Node::CanFrameCallback, this, std::placeholders::_1));
 
+  // TODO: make configurable
   subscription_ = this->create_subscription<can_msgs::msg::Frame>(
     "/from_can_bus", 10,
     std::bind(&PeContinentalArs408Node::CanFrameCallback, this, std::placeholders::_1));
+
+  // TODO: make configurable
+  can_messages_out_ = this->create_publisher<can_msgs::msg::Frame>("/to_can_bus", 10);
 
   publisher_radar_tracks_ =
     this->create_publisher<radar_msgs::msg::RadarTracks>("~/output/objects", 10);
