@@ -1,4 +1,4 @@
-// Copyright 2021 Perception Engine, Inc. All rights reserved.
+// Copyright 2024 Telemething, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,10 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "ars408_ros/ars408_ros_node.hpp"
-
+#include "../include/ars408_ros/ars408_ros_node.hpp"
 #include <rclcpp/rclcpp.hpp>
-
 #include <string>
 #include <unordered_map>
 
@@ -176,8 +174,6 @@ void PeContinentalArs408Node::RadarDetectedObjectsCallback(
   output_scan.header.frame_id = output_frame_;
   output_scan.header.stamp = can_data_->header.stamp;
 
-  //***************************************************************************************
-
   visualization_msgs::msg::MarkerArray marker_array;
   marker_array.markers.clear();
 
@@ -227,8 +223,6 @@ void PeContinentalArs408Node::RadarDetectedObjectsCallback(
 
   int32_t marker_index = 100;
 
-  //****************************************************************************************
-
   for (const auto & object : detected_objects) 
   {
     if (publish_radar_track_) 
@@ -239,8 +233,6 @@ void PeContinentalArs408Node::RadarDetectedObjectsCallback(
     {
       output_scan.returns.emplace_back(ConvertRadarObjectToRadarReturn(object.second));
     }
-
-    //****************************************************************************************
 
     if(true)
     {
@@ -311,8 +303,6 @@ void PeContinentalArs408Node::RadarDetectedObjectsCallback(
 
       marker_array.markers.push_back(mobject);
     }
-
-  //****************************************************************************************
   }
 
   if (publish_radar_track_) 
@@ -327,8 +317,6 @@ void PeContinentalArs408Node::RadarDetectedObjectsCallback(
   {
     marker_array_publisher_->publish(marker_array);
   }
-
-
 }
 
 unique_identifier_msgs::msg::UUID PeContinentalArs408Node::GenerateRandomUUID()
@@ -360,17 +348,11 @@ void PeContinentalArs408Node::Run()
     std::bind(&PeContinentalArs408Node::RadarDetectedObjectsCallback, this, std::placeholders::_1),
     sequential_publish_);
 
-  //subscription_ = this->create_subscription<can_msgs::msg::Frame>(
-  //  "~/input/frame", 10,
-  //  std::bind(&PeContinentalArs408Node::CanFrameCallback, this, std::placeholders::_1));
-
-  // TODO: make configurable
   subscription_ = this->create_subscription<can_msgs::msg::Frame>(
-    "/from_can_bus", 10,
+    "~/input/from_can", 10,
     std::bind(&PeContinentalArs408Node::CanFrameCallback, this, std::placeholders::_1));
 
-  // TODO: make configurable
-  can_messages_out_ = this->create_publisher<can_msgs::msg::Frame>("/to_can_bus", 10);
+  can_messages_out_ = this->create_publisher<can_msgs::msg::Frame>("~/output/to_can", 10);
 
   publisher_radar_tracks_ =
     this->create_publisher<radar_msgs::msg::RadarTracks>("~/output/objects", 10);

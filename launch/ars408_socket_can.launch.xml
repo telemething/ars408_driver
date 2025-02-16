@@ -7,7 +7,7 @@
   <arg name="receiver_interval_sec" default="0.01" />
 
   <!-- ARS408 driver param -->
-  <arg name="input/frame" default="/sensing/radar/can_tx" />
+  <arg name="input/from_can" default="/input/from_can" />
   <arg name="output/objects" default="objects_raw" />
   <arg name="output/scan" default="scan" />
   <arg name="publish_radar_track" default="true" />
@@ -22,8 +22,8 @@
     <arg name="interval_sec" value="$(var receiver_interval_sec)" />
   </include>
 
-  <include file="$(find-pkg-share pe_ars408_ros)/launch/continental_ars408.launch.xml">
-    <arg name="input/frame" value="$(var input/frame)" />
+  <include file="$(find-pkg-share ars408_ros)/launch/continental_ars408.launch.xml">
+    <arg name="input/from_can" value="$(var input/from_can)" />
     <arg name="output/objects" value="$(var output/objects)" />
     <arg name="output/scan" value="$(var output/scan)" />
     <arg name="publish_radar_track" value="$(var publish_radar_track)" />

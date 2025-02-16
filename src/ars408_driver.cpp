@@ -1,4 +1,4 @@
-// Copyright 2021 Perception Engine, Inc. All rights reserved.
+// Copyright 2024 Telemething, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,9 +13,7 @@
 // limitations under the License.
 
 #include "ars408_ros/ars408_driver.hpp"
-
 #include <rclcpp/rclcpp.hpp>
-
 #include <string>
 #include <unordered_map>
 #include <utility>

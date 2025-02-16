@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(pe_ars408_ros)
+project(ars408_ros)
 
 if(NOT "${CMAKE_CXX_STANDARD}")
   set(CMAKE_CXX_STANDARD 14)
@@ -16,22 +16,22 @@ ament_auto_find_build_dependencies()
 #find_package(visualization_msgs REQUIRED)
 
 # Driver Library
-ament_auto_add_library(pe_ars408_parser SHARED
+ament_auto_add_library(ars408_parser SHARED
   src/ars408_driver.cpp
 )
 
 # ROS node
-ament_auto_add_library(pe_ars408_node_component SHARED
+ament_auto_add_library(ars408_node_component SHARED
   src/ars408_ros_node.cpp
 )
 
-target_link_libraries(pe_ars408_node_component
-  pe_ars408_parser
+target_link_libraries(ars408_node_component
+  ars408_parser
 )
 
-rclcpp_components_register_node(pe_ars408_node_component
+rclcpp_components_register_node(ars408_node_component
   PLUGIN "PeContinentalArs408Node"
-  EXECUTABLE pe_ars408_node
+  EXECUTABLE ars408_node
 )
 
 if(BUILD_TESTING)

@@ -1,0 +1,31 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "ROS: Launch Debug",
+            "request": "launch",
+            "target": "/home/mark/workspaces/humble_contrib/src/ars408_driver/launch/launch/ars408.launch.xml",
+            "arguments": [
+                "use_front_cameras:=False",
+                "use_surround_cameras:=False",
+                "use_front_lidar:=False",
+                "use_surround_lidars:=False",
+                "use_foxglove_bridge:=False"
+            ],
+            "launch": ["rviz","v4l2_camera_node"],
+            "type": "ros",
+            "preLaunchTask": "colcon build debug"
+        },        
+        {
+            "name": "ROS: Launch",
+            "request": "launch",
+            "target": "/home/mark/workspaces/humble_contrib/src/ars408_driver/launch/launch/ars408.launch.xml",
+            "launch": ["rviz","v4l2_camera_node"],
+            "type": "ros",
+            "preLaunchTask": "colcon build"
+        }
+    ]
+}

@@ -1,8 +1,11 @@
 <launch>
   <!-- interface -->
-  <arg name="input/frame" default="/sensing/radar/can_tx" />
-  <arg name="output/objects" default="objects_raw" />
-  <arg name="output/scan" default="scan" />
+  <arg name="input/from_can" default="~/input/from_can" />
+  <arg name="output/to_can" default="~/output/to_can" />
+  <!--<arg name="input/from_can" default="/from_can_bus1" />
+  <arg name="output/to_can" default="/to_can_bus1" />-->
+  <arg name="output/objects" default="~/output/objects" />
+  <arg name="output/scan" default="~/output/scan" />
   <!-- parameter -->
   <arg name="output_frame" default="front_radar" />
   <arg name="publish_radar_track" default="true" />
@@ -13,8 +16,9 @@
 
   <node pkg="tf2_ros" exec="static_transform_publisher" name="map_to_front_radar_link_broadcaster" args="0 0 0 0 0 0 map front_radar" output="screen"/>
 
-  <node pkg="pe_ars408_ros" exec="pe_ars408_node" name="pe_ars408_node" output="screen">
-    <remap from="~/input/frame" to="$(var input/frame)" />
+  <node pkg="ars408_ros" exec="ars408_node" name="ars408_node" output="screen">
+    <remap from="~/input/from_can" to="$(var input/from_can)" />
+    <remap from="~/output/to_can" to="$(var output/to_can)" />
     <remap from="~/output/objects" to="$(var output/objects)" />
     <remap from="~/output/scan" to="$(var output/scan)" />
     <param name="publish_radar_track" value="$(var publish_radar_track)" />

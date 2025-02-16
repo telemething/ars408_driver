@@ -1,4 +1,4 @@
-// Copyright 2021 Perception Engine, Inc. All rights reserved.
+// Copyright 2024 Telemething, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -32,7 +32,6 @@
 
 class PeContinentalArs408Node : public rclcpp::Node
 {
-  rclcpp::Subscription<can_msgs::msg::Frame>::SharedPtr subscriber_can_raw_;
   rclcpp::Subscription<can_msgs::msg::Frame>::SharedPtr subscription_;
   rclcpp::Publisher<can_msgs::msg::Frame>::SharedPtr can_messages_out_;
   rclcpp::Publisher<radar_msgs::msg::RadarTracks>::SharedPtr publisher_radar_tracks_;

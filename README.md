@@ -38,10 +38,13 @@ ros2 launch continental_ars408_socket_can.launch.xml
 ## Design
 ### Input
 
-- `input/frame`
+- `input/from_can`
   - `can_msgs` <https://github.com/ros-industrial/ros_canopen/tree/melodic-devel/can_msgs>
 
 ### Output
+
+- `output/to_can`
+  - `can_msgs` <https://github.com/ros-industrial/ros_canopen/tree/melodic-devel/can_msgs>
 
 - `output/objects`
   - `RadarTrack`: <https://github.com/ros-perception/radar_msgs/blob/ros2/msg/RadarTrack.msg>
@@ -68,9 +71,9 @@ ros2 launch continental_ars408_socket_can.launch.xml
 
 ### launcher
 
-- continental_ars408.xml
+- ars408.xml
   - Base launcher
-- continental_ars408_socket_can.xml
+- ars408_socket_can.xml
   - The launch file will initiate two nodes:
     1. socketcan_bridge to read from `can0` and publish the CAN msg in `can_raw`
     1. Continental ARS408 driver will read the `can_raw`, parse and publish `RadarTrack` or `RadarReturn`
